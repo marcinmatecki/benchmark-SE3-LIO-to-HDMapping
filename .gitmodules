@@ -1,0 +1,6 @@
+[submodule "src/se3-lio"]
+	path = src/se3-lio
+	url = https://github.com/url-kaist/se3-lio
+[submodule "src/se3-lio-to-hdmapping/src/3rdparty/LASzip"]
+	path = src/se3-lio-to-hdmapping/src/3rdparty/LASzip
+	url = https://github.com/LASzip/LASzip.git
