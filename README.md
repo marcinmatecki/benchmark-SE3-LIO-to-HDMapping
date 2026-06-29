@@ -1,47 +1,130 @@
-# SE3-LIO to HDMapping simplified instruction
+# [SE3-LIO](https://github.com/url-kaist/se3-lio) converter to [HDMapping](https://github.com/MapsHD/HDMapping)
 
-## Step 1 (prepare data)
-Download the dataset `reg-1.bag` by clicking [link](https://cloud.cylab.be/public.php/dav/files/7PgyjbM2CBcakN5/reg-1.bag) (it is part of [Bunker DVI Dataset](https://charleshamesse.github.io/bunker-dvi-dataset)) and convert with [tool](https://github.com/MapsHD/livox_bag_aggregate) to 'reg-1.bag-pc.bag'.
+## Hint
 
-File 'reg-1.bag-pc.bag' is an input for further calculations.
-It should be located in '~/hdmapping-benchmark/data'.
+Please change branch to:
 
-## Step 2 (prepare docker)
-```shell
-mkdir -p ~/hdmapping-benchmark
-cd ~/hdmapping-benchmark
-git clone https://github.com/MapsHD/benchmark-SE3-LIO-to-HDMapping --recursive
-cd benchmark-SE3-LIO-to-HDMapping
-git checkout Bunker-DVI-Dataset-reg-1
-docker build -t se3-lio_noetic .
+[Bunker-DVI-Dataset-reg-1](https://github.com/MapsHD/benchmark-SE3-LIO-to-HDMapping/tree/Bunker-DVI-Dataset-reg-1)
+
+for quick experiment.
+
+---
+
+## Intended use
+
+This repository integrates **SE3-LIO** with **HDMapping**.
+
+It contains:
+
+- SE3-LIO workspace
+- tested SE3-LIO configuration
+- converter for HDMapping output
+
+SE3-LIO provides odometry and registered point clouds:
+
+```
+/local/cloud_registered_body
+/local/odometry
 ```
 
-## Step 3 (run docker, file 'reg-1.bag' should be in '~/hdmapping-benchmark/data')
-```shell
-cd ~/hdmapping-benchmark/benchmark-SE3-LIO-to-HDMapping
-chmod +x docker_session_run-ros1-se3-lio.sh 
-cd ~/hdmapping-benchmark/data
-~/hdmapping-benchmark/benchmark-SE3-LIO-to-HDMapping/docker_session_run-ros1-se3-lio.sh reg-1.bag-pc.bag .
+---
+
+## Dependencies
+
+```bash
+sudo apt install -y nlohmann-json3-dev
 ```
 
-## Step 4 (Open and visualize data)
-Expected data should appear in ~/hdmapping-benchmark/data/output_hdmapping-SE3-LIO
-Use tool [multi_view_tls_registration_step_2](https://github.com/MapsHD/HDMapping) to open session.json from ~/hdmapping-benchmark/data/output_hdmapping-SE3-LIO.
+---
 
-You should see following data in folder '~/hdmapping-benchmark/data/output_hdmapping-SE3-LIO'
+## Build
 
-lio_initial_poses.reg
+Clone repository:
 
-poses.reg
+```bash
+mkdir -p ~/test_ws/src
 
-scan_lio_*.laz
+cd ~/test_ws/src
 
-session.json
+git clone https://github.com/MapsHD/benchmark-SE3-LIO-to-HDMapping.git --recursive
 
-trajectory_lio_*.csv
+cd ~/test_ws
 
-## Movie
-[[movie]]()
+catkin_make
+```
 
-## Contact email
-januszbedkowski@gmail.com
+Source workspace:
+
+```bash
+source /opt/ros/noetic/setup.bash
+source ~/test_ws/devel/setup.bash
+```
+
+---
+
+# Usage
+
+## Start SE3-LIO
+
+Run:
+
+```bash
+roslaunch se3_lio run_se3lio_ncd.launch use_sim_time:=true
+```
+
+---
+
+## Play dataset
+
+In another terminal:
+
+```bash
+source /opt/ros/noetic/setup.bash
+source ~/test_ws/devel/setup.bash
+
+rosbag play <dataset.bag> --clock
+```
+
+---
+
+## Record SE3-LIO output
+
+Record topics:
+
+```bash
+rosbag record \
+/local/cloud_registered_body \
+/local/odometry \
+-O recorded-se3-lio.bag
+```
+
+---
+
+## Convert to HDMapping
+
+After recording:
+
+```bash
+source /opt/ros/noetic/setup.bash
+source ~/test_ws/devel/setup.bash
+
+rosrun se3-lio-to-hdmapping listener \
+recorded-se3-lio.bag \
+output_hdmapping
+```
+
+Output:
+
+```
+output_hdmapping/
+```
+
+---
+
+## Stop
+
+Stop launch and recording:
+
+```
+CTRL+C
+```
