@@ -59,8 +59,8 @@ RUN git clone https://github.com/Livox-SDK/livox_ros_driver2.git && \
 
 WORKDIR /ros_ws
 
-RUN sed -i 's|/os_cloud_node/imu|/livox/imu|g' src/se3-lio/pipelines/ros1/config/ncd.yaml \
- && sed -i 's|/os_cloud_node/points|/livox/pointcloud|g' src/se3-lio/pipelines/ros1/config/ncd.yaml
+RUN sed -i 's|/os_cloud_node/imu|/livox/imu|g' src/se3-lio/config/ncd.yaml \
+ && sed -i 's|/os_cloud_node/points|/livox/pointcloud|g' src/se3-lio/config/ncd.yaml
 
 RUN source /opt/ros/noetic/setup.bash && \
     catkin build livox_ros_driver2 --cmake-args -DROS_EDITION=ROS1
